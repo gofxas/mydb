@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>采集的一些bing背景图</title>
+    <script src="https://unpkg.com/vue@2.7.14/dist/vue.js"></script>
+</head>
+<style>
+    ::-webkit-scrollbar {
+        width: 4px;
+        height: 4px;
+        cursor: pointer;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: #97a2bf;
+    }
+
+    ::-webkit-scrollbar-track {
+        border-radius: 4px;
+        background-color: rgba(144, 147, 153, 0.3);
+    }
+
+    body {
+        margin: 0;
+    }
+
+    .container {
+        position: absolute;
+        width: 100%;
+        min-width: 800px;
+        height: 100%;
+        background-color: #000;
+        overflow: auto;
+    }
+
+    .box {
+        width: 800px;
+        margin: 0 auto;
+    }
+
+    .img-item {
+        position: relative;
+        transition: all .3s;
+    }
+
+    .img-item:hover .img-title {
+        opacity: 1;
+    }
+
+    .img-item img {
+        width: 100%;
+        display: block;
+    }
+
+    .img-title {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        left: 0;
+        bottom: 0;
+        text-align: right;
+        padding: 12px;
+        box-sizing: border-box;
+        transition: all .3s;
+        background: linear-gradient(180deg, #c9c9c900 0%, #000000ab 100%);
+    }
+
+    .img-title p:first-child {
+        color: #fff;
+    }
+
+    .img-title p:last-child {
+        color: #fff;
+        font-size: 12px;
+    }
+
+    .box h1 {
+        color: #fff;
+    }
+
+    .box .api {
+        color: #9b9b9b;
+    }
+</style>
+
+<body>
+    <div id="app" class="container">
+        <div class="box">
+            <h1>采集的一些bing背景图</h1>
+            <p class="api">
+                <b>api:</b> http://server.0231019.top/getBg?page=1
+            </p>
+            <div v-for="(item,index) in list" class="img-item" :key="item._id">
+                <img :src="item.url" :alt="item.title">
+                <div class="img-title">
+                    <p>{{item.title}}</p>
+                    <p>{{item.date}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data() {
+            return {
+                list: [],
+                end: false,
+                page: 1,
+                effect: false,
+            }
+        },
+        methods: {
+            getBg(page = 1) {
+                this.effect = true;
+                fetch('http://server.0231019.top/getBg?page=' + page).then(res => res.json())
+                .then(res => {
+                    if (res.data.length) {
+                        this.page = page;
+                        this.list = this.list.concat(res.data)
+                    } else {
+                        this.end = true;
+                    };
+                    setTimeout(() => {
+                        this.effect = false;
+                    }, 1000)
+                })
+            }
+        },
+        mounted() {
+            this.getBg();
+            document.querySelector('.container').addEventListener('scroll', e => {
+                let rest = e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight;
+                if (rest < 300 && !this.effect && !this.end ) {
+                    console.log(e.target.scrollHeight - e.target.scrollTop - e.target.clientHeight, '剩余高度');
+                    this.getBg(this.page + 1)
+                }
+            })
+        },
+    })
+</script>
+
+</html>
