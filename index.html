@@ -85,7 +85,7 @@
             generateMath();
             return;
         } else {
-            fetch('http://server.0231019.top/getIp?type=anonymous')
+            fetch('https://server.0231019.top/getIp?type=anonymous')
             .then(r => r.json())
             .then(res => {
                 window.open(`http://${res.ip}:8003`)
